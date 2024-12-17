@@ -1,0 +1,24 @@
+name: Vulnerability Check
+
+on: [push]
+
+jobs:
+  vulnerability:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.18.3]
+
+    steps:
+    - uses: actions/checkout@v2
+    # use dict key for https://github.com/nektos/act/issues/104
+    - name: Use Node.js ${{ matrix['node-version'] }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix['node-version'] }}
+    - run: npm ci
+    - run: npx nanoprobe safe
+    - run: npm audit --production
+      env:
+        CI: true

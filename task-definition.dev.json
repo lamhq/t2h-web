@@ -1,0 +1,98 @@
+{
+    "containerDefinitions": [
+        {
+            "name": "frontend",
+            "image": "885729565715.dkr.ecr.ap-southeast-1.amazonaws.com/t2hfe:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "hostPort": 3000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "PROXY_DOMAIN",
+                    "value": "frontend-dev.truck2hand.com"
+                },
+                {
+                    "name": "PROXY_SCHEME",
+                    "value": "https"
+                },
+                {
+                    "name": "PROXY_PORT",
+                    "value": "443"
+                },
+                {
+                    "name": "DOMAIN",
+                    "value": "frontend-dev.truck2hand.com"
+                },
+                {
+                    "name": "BACKEND_DOMAIN",
+                    "value": "backend.truck2hand.internal"
+                },
+                {
+                    "name": "BACKEND_SCHEME",
+                    "value": "http"
+                },
+                {
+                    "name": "BACKEND_PORT",
+                    "value": "8000"
+                },
+                {
+                    "name": "FACEBOOK_CALLBACK_URL",
+                    "value": "https://frontend-dev.truck2hand.com/api/auth/facebook/callback"
+                },
+                {
+                    "name": "LINE_CALLBACK_URL",
+                    "value": "https://frontend-dev.truck2hand.com/api/auth/line/callback"
+                },
+                {
+                  "name": "OMISE_PUBLIC_KEY",
+                  "value": "pkey_test_5k3zq14o3lpw53whsno"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "FACEBOOK_APP_ID",
+                    "valueFrom": "/truck2hand-dev/facebook_app_id"
+                },
+                {
+                    "name": "FACEBOOK_APP_SECRET",
+                    "valueFrom": "/truck2hand-dev/facebook_app_secret"
+                },
+                {
+                    "name": "LINE_CHANNEL_ID",
+                    "valueFrom": "/truck2hand-dev/line_channel_id"
+                },
+                {
+                    "name": "LINE_CHANNEL_SECRET",
+                    "valueFrom": "/truck2hand-dev/line_channel_secret"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "truck2hand",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "frontend"
+                }
+            }
+        }
+    ],
+    "family": "t2hfe",
+    "taskRoleArn": "arn:aws:iam::885729565715:role/truck2hand-dev-ecs-task-execution-role",
+    "executionRoleArn": "arn:aws:iam::885729565715:role/truck2hand-dev-ecs-task-execution-role",
+    "networkMode": "awsvpc",
+    "volumes": [],
+    "placementConstraints": [],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512"
+}

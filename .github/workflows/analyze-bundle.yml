@@ -1,0 +1,53 @@
+name: Analyze Bundle Size
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  analyze_bundle_size:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.18.3]
+
+    env:
+      CI: true
+
+    steps:
+    - uses: actions/checkout@v2
+    # use dict key for https://github.com/nektos/act/issues/104
+    - name: Use Node.js ${{ matrix['node-version'] }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix['node-version'] }}
+    - run: npm ci
+
+    - name: Analyze Bundle Size
+      id: analyze_bundle_size
+      run: |
+        npm run analyze | tee .log
+        npm run capture::server
+        npm run capture::browser
+        ANALYZE_RESULT=$(cat .log | sed -n -e '/^Page.*$/,$p' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g')
+        echo "::set-output name=analyze-result::$ANALYZE_RESULT"
+
+    # Disable: Storage for Actions and Packages is full now
+    # - uses: actions/upload-artifact@v2
+    #   with:
+    #     name: bundle-size-treemap
+    #     path: .analyze/*.png
+
+    - name: Post to PR
+      id: post_to_PR
+      env:
+        COMMENT_URL: ${{ github.event.pull_request.comments_url }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CLI_LOG: ${{ steps.analyze_bundle_size.outputs['analyze-result'] }}
+      run: |
+        curl \
+        -X POST $COMMENT_URL \
+        -H "Content-Type: application/json" \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        --data '{ "body": "## Bundle Size Analysis\n```'"$CLI_LOG"'```" }'

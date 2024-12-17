@@ -1,0 +1,25 @@
+{
+  "presets": ["next/babel"],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./"],
+        "alias": {
+          "@components": "./src/components",
+          "@constants": "./src/constants",
+          "@containers": "./src/containers",
+          "@common": "./src/common",
+          "@server": "./server",
+          "@services": "./src/services",
+          "@contexts": "./src/contexts",
+          "@hocs": "./src/hocs"
+        }
+      }
+    ],
+    [
+      "styled-components",
+      { "ssr": true, "displayName": true, "preprocess": false }
+    ]
+  ]
+}

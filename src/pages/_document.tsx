@@ -1,0 +1,49 @@
+import * as React from 'react';
+import { ServerStyleSheet } from 'styled-components';
+import Document, { Html, Head, Main, NextScript } from 'next/document';
+import { STATIC_FOLDER } from '@constants/env';
+import { ServerStyleSheets as MaterialUiServerStyleSheets } from '@material-ui/styles';
+
+export default class extends Document<{ locale: string }> {
+  static async getInitialProps(ctx) {
+    const styledComponentSheet = new ServerStyleSheet();
+    const materialUiSheets = new MaterialUiServerStyleSheets();
+
+    const documentProps = await Document.getInitialProps(ctx);
+    const { renderPage, req } = ctx;
+    const page = renderPage((App) => (props) => styledComponentSheet.collectStyles(materialUiSheets.collect(<App {...props} />)));
+
+    return {
+      ...documentProps,
+      ...page,
+      locale: req.locale,
+      styles: (
+        <>
+          {documentProps.styles}
+          {materialUiSheets.getStyleElement()}
+          {styledComponentSheet.getStyleElement()}
+        </>
+      ),
+    };
+  }
+
+  render() {
+    return (
+      <Html lang={this.props.locale}>
+        <Head>
+          <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <meta name="format-detection" content="telephone=no, address=no, email=no" />
+          <meta name="theme-color" content="#78d4e6" />
+          <link rel="manifest" href={`${STATIC_FOLDER}/manifest.json`} />
+          <link rel="apple-touch-icon" sizes="180x180" href={`${STATIC_FOLDER}/images/icon/icon-180.png`} />
+          <link rel="shortcut icon" href={`${STATIC_FOLDER}/images/icon/favicon.ico`} />
+        </Head>
+        <body>
+          <Main />
+          <NextScript />
+        </body>
+      </Html>
+    );
+  }
+}
